@@ -22,6 +22,23 @@ https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/amazon-corretto-11.jdk/Contents/Home
 ```
 
+
+## Database
+
+### local setup
+
+install mysql
+https://dev.mysql.com/downloads/mysql/
+
+```
+export PATH=${PATH}:/usr/local/mysql/bin
+sudo mysql --password [password_set_up_after_msql_install]
+
+mysql> create database apgar_db;
+```
+
+Note: using root user for dev only, don't do this.
+
 ## React App
 
 ### Installing
