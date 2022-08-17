@@ -9,5 +9,4 @@ public class Message {
     public Message(String text) {
         this.messageText = text;
     }
-
 }
