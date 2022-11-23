@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "jslint": "^0.12.1"
+  },
+  "name": "appgar",
+  "description": "Manage your goals",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahjohnston/apgarScore.git"
+  },
+  "author": "Annie Johnston",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ahjohnston/apgarScore/issues"
+  },
+  "homepage": "https://github.com/ahjohnston/apgarScore#readme"
+}
