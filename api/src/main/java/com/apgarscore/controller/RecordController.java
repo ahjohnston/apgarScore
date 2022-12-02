@@ -19,20 +19,17 @@ import java.util.Map;
 import java.util.Date;
 
 @CrossOrigin
-@RestController // This means that this class is a Controller
+@RestController
 class RecordController {
     @Autowired
     private RecordRepository recordRepository;
 
     @CrossOrigin
-    @PostMapping(path = "/records/add") // Map ONLY POST Requests
+    @PostMapping(path = "/records/add") 
     public Record addRecord(
-            @RequestParam int goalID,
+            @RequestParam Integer goalID,
             @RequestParam String plan,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-
-            // ResponseEntity main(@RequestParam(name = 'dateTime') @DateTimeFormat(pattern
-            // = &quot;yyyy-MM-dd'T'HH:mm&quot;) LocalDateTime dateTime) {
 
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
             @RequestParam boolean complete,
@@ -41,7 +38,7 @@ class RecordController {
             ) {
 
         Record record = new Record();
-        // record.setGoalID(goalID);
+        record.setGoalID(goalID);
         record.setPlan(plan);
         record.setStartDate(startDate);
         record.setEndDate(endDate);
