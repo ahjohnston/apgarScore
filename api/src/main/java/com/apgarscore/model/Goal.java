@@ -34,7 +34,7 @@ public class Goal {
     private List<Record> records;
 
     private String goalName;
-    private String frequency;
+    private String cadence;
     private Integer min_progress_events;
     private String category;
     private Boolean active;

@@ -9,7 +9,7 @@ export function AddGoalModal() {
     const [description, setDescription] = useState({});
     const [category, setCategory] = useState({});
     const [freqUnit, setFreqUnit] = useState({});
-    const [freqCadence, setFreqCadence] = useState({});
+    const [cadence, setCadence] = useState({});
 
     const handleClose = () => setShow(false);
     const handleShow = () => {
@@ -29,7 +29,7 @@ export function AddGoalModal() {
     const handleSubmit = () => {
         const data = {
             goalName: description,
-            frequency: freqCadence,
+            cadence: cadence,
             min_progress_events: freqUnit,
             category: category,
             active: true
@@ -37,7 +37,7 @@ export function AddGoalModal() {
         console.log('sending post request', data)
         axios({
             method: 'post',
-            url: `http://localhost:8080/goals/add?goalName=${description}&frequency=${freqCadence}&min_progress_events=${freqUnit}&category=${category}&active=${true}`,
+            url: `http://localhost:8080/goals/add?goalName=${description}&cadence=${cadence}&min_progress_events=${freqUnit}&category=${category}&active=${true}`,
             // data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -94,15 +94,15 @@ export function AddGoalModal() {
                             <div key="inline-radio" className="mb-3">
                                 <Form.Check inline label="Day" name="group1" type="radio" id="inline-radio-day"
                                     onClick={
-                                        () => setFreqCadence('daily')
+                                        () => setCadence('daily')
                                     }/>
                                 <Form.Check inline label="Week" name="group1" type="radio" id="inline-radio-week"
                                     onClick={
-                                        () => setFreqCadence('weekly')
+                                        () => setCadence('weekly')
                                     }/>
                                 <Form.Check inline label="Month" name="group1" type="radio" id="inline-radio-month"
                                     onClick={
-                                        () => setFreqCadence('monthly')
+                                        () => setCadence('monthly')
                                     }/>
                             </div>
                         </Form.Group>
