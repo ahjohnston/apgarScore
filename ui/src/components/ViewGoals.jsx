@@ -4,7 +4,9 @@ import axios from "axios";
 import { useEffect } from "react";
 
 export function ViewGoals() {
-  const [allGoals, setAllGoals] = useState({});
+  // const [allGoals, setAllGoals] = useState({});
+  const [dailyGoals, setDailyGoals] = useState({});
+  const [weeklyGoals, setWeeklyGoals] = useState({});
 
   let newDate = new Date();
   let year = newDate.getFullYear();
@@ -18,19 +20,34 @@ export function ViewGoals() {
   useEffect(() => {
     axios({
       method: "get",
-      url: "http://localhost:8080/goals/view",
+      url: "http://localhost:8080/goals/view?cadence=weekly",
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
     })
       .then(function (response) {
-        setAllGoals(response.data);
+        setWeeklyGoals(response.data);
+      })
+      .catch(function (error) {
+      });
+
+    axios({
+      method: "get",
+      url: "http://localhost:8080/goals/view?cadence=daily",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
+      .then(function (response) {
+        setDailyGoals(response.data);
+        console.log("daily goals", dailyGoals);
       })
       .catch(function (error) {
         console.log("error", error);
       });
-  }); //empty array means this will not run continuously
+  }); //second parameter for useEffect of an empty array means this will not run continuously
 
   function postNewRecord(params) {
     axios({
@@ -145,7 +162,7 @@ export function ViewGoals() {
 
   return (
     <>
-      {/* <div>
+      <div>
         <h2> Daily Goals</h2>
         <input
           type="date"
@@ -159,61 +176,13 @@ export function ViewGoals() {
               <th>Done</th>
               <th>Goal Name</th>
               <th>Plan</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allGoals.length > 0
-              ? allGoals.map((goal) => {
-                  if (goal.frequency === "daily") {
-                    goal.records.map((record) => {
-                      if (record.startDate.slice(0, 10) === dayOf) {
-                        return (
-                          <tr key={goal.id}>
-                            <td>
-                              <input
-                                id={goal.id}
-                                type="checkbox"
-                                onChange={markComplete}
-                              ></input>
-                            </td>
-                            <td> {goal.goalName}</td>
-                            <td> Plan</td>
-                            <td>
-                              <button>Delete</button>
-                            </td>
-                          </tr>
-                        );
-                      }
-                    });
-                  }
-                })
-              : null}
-          </tbody>
-        </Table>
-      </div> */}
-      <div>
-        <h2> Weekly Goals</h2>
-        <input
-          type="date"
-          onChange={onDateChange}
-          value={weekOf.toString().slice(0)}
-          name="weekly"
-        ></input>
-        <Table bordered striped>
-          <thead>
-            <tr>
-              <th>Done</th>
-              <th>Goal Name</th>
-              <th>Plan</th>
               <th>Edit</th>
               <th>Delete</th>
             </tr>
           </thead>
           <tbody>
-            {allGoals.length > 0
-              ? allGoals.map((goal) => {
-                  // if (goal.frequency === "weekly" ) {
+            {dailyGoals.length > 0
+              ? dailyGoals.map((goal) => {
                   let complete = false,
                     recordId = null,
                     recordPlan = "", //this didn't work using NULL (the previous plan would stick around, instead of the placeholder text)
@@ -259,8 +228,77 @@ export function ViewGoals() {
                       </td>
                     </tr>
                   );
-
-                  // }
+                })
+              : null}
+          </tbody>
+        </Table>
+      </div>
+      <div>
+        <h2>Weekly Goals</h2>
+        <input
+          type="date"
+          onChange={onDateChange}
+          value={weekOf.toString().slice(0)}
+          name="weekly"
+        ></input>
+        <Table bordered striped>
+          <thead>
+            <tr>
+              <th>Done</th>
+              <th>Goal Name</th>
+              <th>Plan</th>
+              <th>Edit</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {weeklyGoals.length > 0
+              ? weeklyGoals.map((goal) => {
+                  let complete = false,
+                    recordId = null,
+                    recordPlan = "", //this didn't work using NULL (the previous plan would stick around, instead of the placeholder text)
+                    recordMatch = false;
+                  if (goal.records.length > 0) {
+                    goal.records.map((record) => {
+                      if (record.startDate.slice(0, 10) === weekOf) {
+                        complete = record.complete;
+                        recordId = record.id;
+                        recordPlan = record.plan;
+                        recordMatch = true;
+                      }
+                    });
+                  }
+                  //the key to this nested .map was to include a return statement for each .map
+                  return (
+                    <tr key={goal.id}>
+                      <td>
+                        <input
+                          id={recordId}
+                          name={goal.id}
+                          type="checkbox"
+                          checked={complete}
+                          onChange={markComplete}
+                        ></input>
+                      </td>
+                      <td> {goal.goalName}</td>
+                      <td>
+                        <input
+                          id={recordId}
+                          name={goal.id}
+                          type="text"
+                          placeholder="Add your plan here"
+                          value={recordPlan}
+                          onChange={updatePlan}
+                        ></input>
+                      </td>
+                      <td>
+                        <button>Edit</button>
+                      </td>
+                      <td>
+                        <button>Delete</button>
+                      </td>
+                    </tr>
+                  );
                 })
               : null}
           </tbody>
