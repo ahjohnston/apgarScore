@@ -9,7 +9,7 @@ function App() {
             <header className="App-header">
                 <h1>Apgar Score</h1>
             </header>
-            <div class='container centered-content'>
+            <div className='container centered-content'>
                 <ViewGoals/>
                 <AddGoalModal/>
             </div>
