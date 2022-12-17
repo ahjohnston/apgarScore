@@ -1,6 +1,6 @@
-import logo from './logo.svg';
 import {AddGoalModal} from './components/AddGoalModal';
 import {ViewGoals} from './components/ViewGoals';
+
 import './App.scss';
 
 function App() {

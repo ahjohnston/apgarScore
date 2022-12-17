@@ -2,9 +2,7 @@ package com.apgarscore.controller;
 
 import com.apgarscore.model.Goal;
 import com.apgarscore.repository.GoalRepository;
-import com.apgarscore.model.Message;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
