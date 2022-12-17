@@ -43,15 +43,18 @@ class GoalController {
         //why can't I add more keys? Also, what the heck is this format?
         Map.of(
                 "goalName", goal.getGoalName(),
-                "frequency", goal.getFrequency(),
+                "cadence", goal.getCadence(),
                 "status", "saved")
                 );
     };
 
     @CrossOrigin
     @GetMapping(path = "/goals/view")
-    public @ResponseBody Iterable<Goal> getAllGoals() {
+    public ResponseEntity <Iterable<Goal>> getAllGoals(
+        @RequestParam(required=false) String cadence
+    ) {
         // This returns a JSON or XML with the goals
-        return goalRepository.findAll();
+        if(cadence != null) return new ResponseEntity<Iterable<Goal>> (goalRepository.findByCadence(cadence), HttpStatus.OK);
+        return new ResponseEntity <Iterable<Goal>> (goalRepository.findAll(), HttpStatus.OK);
     }
 }
