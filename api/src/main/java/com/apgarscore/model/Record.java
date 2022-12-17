@@ -22,22 +22,24 @@ public class Record {
     private Integer id;
     //add a foreign key!
     // @ManyToOne(fetch = FetchType.LAZY, targetEntity = Goal.class)
-    // @JoinColumn(name= "goal_id", referencedColumnName = "id")
+    // // @JoinColumn(name= "goal_id", referencedColumnName = "id")
     // private Goal goal;
 
     private Integer goalID;
 
     private String plan;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date startDate;
    
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date endDate;
+
     private boolean complete;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date dateComplete;
+
 
 }
 
