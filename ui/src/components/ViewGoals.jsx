@@ -5,8 +5,8 @@ import { useEffect } from "react";
 
 export function ViewGoals() {
   // const [allGoals, setAllGoals] = useState({});
-  const [dailyGoals, setDailyGoals] = useState({});
-  const [weeklyGoals, setWeeklyGoals] = useState({});
+  const [dailyGoals, setDailyGoals] = useState([]);
+  const [weeklyGoals, setWeeklyGoals] = useState([]);
 
   let newDate = new Date();
   let year = newDate.getFullYear();
@@ -16,6 +16,7 @@ export function ViewGoals() {
 
   const [dayOf, setDayOf] = useState(defaultDate);
   const [weekOf, setWeekOf] = useState(defaultDate);
+  const [weekStart, setWeekStart] = useState(1);
 
   useEffect(() => {
     axios({
@@ -29,9 +30,7 @@ export function ViewGoals() {
       .then(function (response) {
         setWeeklyGoals(response.data);
       })
-      .catch(function (error) {
-      });
-
+      .catch(function (error) {});
     axios({
       method: "get",
       url: "http://localhost:8080/goals/view?cadence=daily",
@@ -42,12 +41,11 @@ export function ViewGoals() {
     })
       .then(function (response) {
         setDailyGoals(response.data);
-        console.log("daily goals", dailyGoals);
       })
       .catch(function (error) {
-        console.log("error", error);
+        // console.log("error", error);
       });
-  }); //second parameter for useEffect of an empty array means this will not run continuously
+  }, []); //second parameter for useEffect of an empty array means this will not run continuously
 
   function postNewRecord(params) {
     axios({
@@ -60,10 +58,10 @@ export function ViewGoals() {
       },
     })
       .then((response) => {
-        console.log(response);
+        // console.log(response);
       })
       .catch((error) => {
-        console.log("error sir", error);
+        // console.log("error sir", error);
       });
   }
 
@@ -78,10 +76,10 @@ export function ViewGoals() {
       },
     })
       .then((response) => {
-        console.log(response);
+        // console.log(response);
       })
       .catch((error) => {
-        console.log("error sir", error);
+        // console.log("error sir", error);
       });
   }
 
@@ -126,7 +124,10 @@ export function ViewGoals() {
   }
 
   function onDateChange(e) {
-    const newDate = new Date(e.target.value);
+    let newDate = new Date(e.target.value);
+    let formattedDate = newDate.toLocaleDateString("en-US", {
+      timeZone: "UTC",
+    });
     let year = newDate.getFullYear();
     let month = String(newDate.getMonth() + 1).padStart(2, "0");
     let day = String(newDate.getDate() + 1).padStart(2, "0");
@@ -135,39 +136,48 @@ export function ViewGoals() {
     if (e.target.name === "daily") {
       setDayOf(renderDate);
     } else {
-      setWeekOf(renderDate);
+      // console.log('week starts on', weekStart)
+      console.log("target date", e.target.value);
+      console.log("Date from target date", newDate);
+      console.log("ISO date", newDate.toISOString());
+      console.log("split ISO", newDate.toISOString().split("T")[0]);
+
+      // console.log('weekday of renderDate', e.target.value.valueAsDate, newDate, newDate.getDay())
+      setWeekOf(formattedDate);
     }
   }
+  function onWeekChange(e) {
+    let newDate = new Date(e.target.value);
+    let getDate = newDate.getDate();
+    
+    let adjustment = weekStart - newDate.getDay() + getDate;
 
-  // function updatePlan(e){
-  //   axios({
-  //     method: "patch",
-  //     url: "http://localhost:8080/records/byId",
-  //     params: {
-  //       id: e.target.key,
-  //       complete: e.target.checked,
-  //     },
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Access-Control-Allow-Origin": "*",
-  //     },
-  //   })
-  //     .then((response) => {
-  //       console.log(response);
-  //     })
-  //     .catch((error) => {
-  //       console.log("error sir", error);
-  //     });
-  // }
+    newDate.setDate(adjustment);
+    console.log("adjusted date", newDate);
+    console.log('locale date', newDate.toLocaleDateString())
+    console.log('locale date w/ options', newDate.toLocaleDateString({
+      month: '2-digit',
+    dateStyle: "long"}))
+    let formattedDate = newDate
+      .toISOString("en-US")
+      .split("T")[0];
+    console.log("formatted date", formattedDate);
+
+    setWeekOf(formattedDate);
+  }
+  function changeWeekStart(e) {
+    setWeekStart(Number(e.target.value));
+    console.log("week starts on", weekStart);
+  }
 
   return (
     <>
-      <div>
+      {/* <div>
         <h2> Daily Goals</h2>
         <input
           type="date"
           onChange={onDateChange}
-          value={dayOf.toString().slice(0)}
+          value={dayOf.toString().slice(0) || ''}
           name="daily"
         ></input>
         <Table bordered striped>
@@ -232,13 +242,25 @@ export function ViewGoals() {
               : null}
           </tbody>
         </Table>
-      </div>
+      </div> */}
       <div>
         <h2>Weekly Goals</h2>
+        <h3>
+          My week starts on:
+          <select list="weekday" onChange={changeWeekStart}>
+            <option value="0">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>Ï{" "}
+          </select>
+        </h3>
         <input
           type="date"
-          onChange={onDateChange}
-          value={weekOf.toString().slice(0)}
+          onChange={onWeekChange}
+          value={weekOf.toString().slice(0) ||''}
           name="weekly"
         ></input>
         <Table bordered striped>
@@ -287,7 +309,7 @@ export function ViewGoals() {
                           name={goal.id}
                           type="text"
                           placeholder="Add your plan here"
-                          value={recordPlan}
+                          value={recordPlan || undefined}
                           onChange={updatePlan}
                         ></input>
                       </td>
