@@ -1,5 +1,5 @@
-import {AddGoalModal} from './components/AddGoalModal';
-import {ViewGoals} from './components/ViewGoals';
+import {AddGoalModal} from './components/AddGoalModal.tsx';
+import {ViewGoals} from './components/ViewGoals.tsx';
 
 import './App.scss';
 
