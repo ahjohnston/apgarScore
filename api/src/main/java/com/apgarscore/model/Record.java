@@ -6,8 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Date;
@@ -28,18 +26,7 @@ public class Record {
     private Integer goalID;
 
     private String plan;
-
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date startDate;
-   
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
-    private Date endDate;
-
-    private boolean complete;
-
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private Date planDate;
     private Date dateComplete;
 
-
 }
-

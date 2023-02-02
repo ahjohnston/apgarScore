@@ -11,7 +11,7 @@ import com.apgarscore.model.Record;
 
 @Repository
 public interface RecordRepository extends JpaRepository<Record, Integer> {
-    List<Record> findByStartDate(Date startDate);
+    List<Record> findByDateComplete(Date dateComplete);
 
     List<Record> findByGoalID(Integer goalID);
 
