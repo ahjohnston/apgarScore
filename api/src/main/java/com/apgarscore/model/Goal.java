@@ -27,16 +27,16 @@ public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    // add a foreign key!
+    // TODO add a foreign key!
     // users_id (foreign key);
     
-    @OneToMany(mappedBy = "goalID", fetch = FetchType.LAZY)
-    private List<Record> records;
-
+    
     private String goalName;
     private String cadence;
     private Integer min_progress_events;
     private String category;
     private Boolean active;
-
+    
+    @OneToMany(mappedBy = "goalID", fetch = FetchType.LAZY)
+    private List<Record> records;
 }

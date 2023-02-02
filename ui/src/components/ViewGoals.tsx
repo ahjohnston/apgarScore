@@ -85,9 +85,12 @@ export function ViewGoals() {
         setDailyGoals(response.data);
       })
       .catch(function (error) {
-        // console.log("error", error);
+        console.log("error", error);
       });
-  }, []); //second parameter for useEffect of an empty array means this will not run continuously
+  }, [weeklyGoals]);
+  //second parameter for useEffect of an empty array means this will not run continuously
+  //removing the second parameter --> runs continuously --> insufficient resources error
+  //[weeklyGoals] --> useEffect will run whenever weeklyGoals changes. GOOD.
 
   function postNewRecord(params: Record) {
     axios({
@@ -333,10 +336,10 @@ export function ViewGoals() {
                         ></input>
                       </td>
                       <td>
-                        <button>Edit</button>
-                      </td>
-                      <td>
-                        <button>Delete</button>
+                        <button>Edit</button> 
+                        {/*TODO add an 'Edit Goal' modal (re-use Add New Goal modal)
+                        add an 'active' toggle
+                        add a filter in the Goal Grid, to only show active goals */}
                       </td>
                     </tr>
                   );
@@ -345,6 +348,6 @@ export function ViewGoals() {
           </tbody>
         </Table>
       </div>
-    </>
+    </div>
   );
 }

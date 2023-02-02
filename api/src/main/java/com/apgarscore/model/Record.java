@@ -13,12 +13,12 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
-@Table(name="record")
+@Table(name = "record")
 public class Record {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    //add a foreign key!
+    // add a foreign key!
     // @ManyToOne(fetch = FetchType.LAZY, targetEntity = Goal.class)
     // // @JoinColumn(name= "goal_id", referencedColumnName = "id")
     // private Goal goal;
