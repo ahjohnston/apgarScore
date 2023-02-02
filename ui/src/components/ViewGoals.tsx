@@ -2,23 +2,17 @@ import React, { useState } from "react";
 import Table from "react-bootstrap/Table";
 import axios from "axios";
 import { useEffect } from "react";
+import { GoalGrid } from "./GoalGrid";
 
 export function ViewGoals() {
   // const [allGoals, setAllGoals] = useState({});
   const [dailyGoals, setDailyGoals] = useState([]);
-  const [weeklyGoals, setWeeklyGoals] = useState([]);
+  const [weeklyGoals, setWeeklyGoals] = useState<Goal[] | null>(null);
 
-  let newDate = new Date();
-  let year = newDate.getFullYear();
-  // @ts-ignore
-  let month = String(newDate.getMonth() + 1).padStart(2, "0");
-  // @ts-ignore
-  let day = String(newDate.getDate()).padStart(2, "0");
-  let defaultDate = year + "-" + month + "-" + day;
-
-  const [dayOf, setDayOf] = useState(defaultDate);
-  const [weekOf, setWeekOf] = useState(defaultDate);
-  const [weekStart, setWeekStart] = useState(1);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const weekOf = getSunday(selectedDate);
+  const weekEnds = getSaturday(selectedDate);
+  const [weekStart, setWeekStart] = useState(0);
 
   type Goal = {
     id: number;
@@ -30,17 +24,22 @@ export function ViewGoals() {
     active: boolean;
   };
   type Record = {
+    id: number | undefined;
+    goalID?: number;
+    plan?: string | undefined | null;
+    planDate: Date | null;
+    dateComplete?: Date | null | undefined;
+  };
+  type RecordResponse = {
     id: number | null;
     goalID: number;
-    startDate: string;
     plan?: string | undefined | null;
-    endDate?: string;
-    complete?: boolean | null | undefined;
-    dateComplete?: string | null;
+    planDate?: string | null;
+    dateComplete: string | null;
   };
 
   useEffect(() => {
-    axios({
+    axios<Goal[]>({
       method: "get",
       url: "http://localhost:8080/goals/view?cadence=weekly",
       headers: {
@@ -49,7 +48,29 @@ export function ViewGoals() {
       },
     })
       .then(function (response) {
-        setWeeklyGoals(response.data);
+        setWeeklyGoals(
+          response.data.map((datum) => {
+            return {
+              id: datum.id,
+              goalName: datum.goalName,
+              cadence: datum.cadence,
+              min_progress_events: datum.min_progress_events,
+              category: datum.category,
+              active: datum.active,
+              records: datum.records.map((record) => {
+                return {
+                  id: record.id,
+                  goalID: record.goalID,
+                  plan: record.plan,
+                  planDate: record.planDate,
+                  dateComplete: record.dateComplete
+                    ? new Date(record.dateComplete)
+                    : null,
+                };
+              }),
+            };
+          })
+        );
       })
       .catch(function (error) {});
     axios({
@@ -78,11 +99,9 @@ export function ViewGoals() {
         "Access-Control-Allow-Origin": "*",
       },
     })
-      .then((response) => {
-        // console.log(response);
-      })
+      .then((response) => {})
       .catch((error) => {
-        // console.log("error sir", error);
+        console.log("error sir", error);
       });
   }
 
@@ -96,9 +115,7 @@ export function ViewGoals() {
         "Access-Control-Allow-Origin": "*",
       },
     })
-      .then((response) => {
-        // console.log(response);
-      })
+      .then((response) => {})
       .catch((error) => {
         // console.log("error sir", error);
       });
@@ -106,35 +123,31 @@ export function ViewGoals() {
 
   function markComplete(e: { target: any }) {
     const { id, name, checked } = e.target;
-    const myRecord : Record = {
+    const myRecord: Record = {
       id: id,
       goalID: name,
-      startDate: weekOf,
-      endDate: weekOf,
-      complete: checked,
-      dateComplete: checked ? weekOf : null,
+      planDate: selectedDate,
+      dateComplete: checked ? selectedDate : null, //default completion date is the 'selected date'
     };
-
     //if the record does not exist, do a POST
-    if (!id) {
+    if (id == 0) {
+      //TODO default id shouldn't be 0, it should be null or undefined
       postNewRecord(myRecord);
     } else {
       //if the recore already exists, do a PATCH
       patchRecord(myRecord);
     }
   }
-
+  //TODO does it make sense to combine "updatePlan" with "markComplete" --> updateRecord? hmm doesn't seem Clean
   function updatePlan(e: any) {
-    const { id, name, value, checked } = e.target;
-    const params = {
+    const { id, name, value } = e.target;
+    const params: Record = {
       id: id,
       goalID: name,
       plan: value,
-      startDate: weekOf,
-      endDate: weekOf,
-      complete: checked,
-      dateComplete: checked ? weekOf : null,
+      planDate: selectedDate, //default planDate is the 'selected date' from state
     };
+
     //if the record does not exist, do a POST
     if (!id) {
       postNewRecord(params);
@@ -143,67 +156,52 @@ export function ViewGoals() {
       patchRecord(params);
     }
   }
-
-  function onDateChange(e: any) {
-    let newDate = new Date(e.target.value);
-    let formattedDate = newDate.toLocaleDateString("en-US", {
-      timeZone: "UTC",
-    });
-    let year = newDate.getFullYear();
-    // @ts-ignore
-    let month = String(newDate.getMonth() + 1).padStart(2, "0");
-    // @ts-ignore
-    let day = String(newDate.getDate() + 1).padStart(2, "0");
-    let renderDate = year + "-" + month + "-" + day;
-
-    if (e.target.name === "daily") {
-      setDayOf(renderDate);
+  //TODO: future feature: allow user to change what day the week starts on (default = Sunday)
+  // function changeWeekStart(e: { target: any }) {
+  //   setWeekStart(Number(e.target.value));
+  // }
+  function getSunday(date: Date) {
+    //TODO: change this to 'getFirstDayOfWeek' (user can customize what day the week starts on)
+    if (date.getDay() === 0) {
+      return date;
     } else {
-      // console.log('week starts on', weekStart)
-      console.log("target date", e.target.value);
-      console.log("Date from target date", newDate);
-      console.log("ISO date", newDate.toISOString());
-      console.log("split ISO", newDate.toISOString().split("T")[0]);
-
-      // console.log('weekday of renderDate', e.target.value.valueAsDate, newDate, newDate.getDay())
-      setWeekOf(formattedDate);
+      let myDate = new Date(date.toString());
+      myDate.setDate(date.getDate() - date.getDay());
+      return myDate;
     }
   }
-  function onWeekChange(e: {target: any}) {
-    let newDate = new Date(e.target.value);
-    let getDate = newDate.getDate();
-
-    let adjustment = weekStart - newDate.getDay() + getDate;
-
-    newDate.setDate(adjustment);
-    console.log("adjusted date", newDate);
-    console.log("locale date", newDate.toLocaleDateString());
-    // console.log(
-    //   "locale date w/ options",
-    //   newDate.toLocaleDateString({
-    //     // month: "2-digit",
-    //     // dateStyle: "long",
-    //   })
-    // );
-    // @ts-ignore
-    let formattedDate = newDate.toISOString("en-US").split("T")[0];
-    console.log("formatted date", formattedDate);
-
-    setWeekOf(formattedDate);
+  function getSaturday(date: Date) {
+    //TODO: change this to 'getLastDayOfWeek' (user can customize what day the week starts on)
+    if (date.getDay() === 7) {
+      return date;
+    } else {
+      let myDate = new Date(date.toString());
+      myDate.setDate(date.getDate() - date.getDay() + 6);
+      return myDate;
+    }
   }
-  function changeWeekStart(e: {target: any}) {
-    setWeekStart(Number(e.target.value));
-    console.log("week starts on", weekStart);
+  function onDateChange(e: any) {
+    setSelectedDate(new Date(e.target.value));
   }
 
   return (
-    <>
+    <div>
+      <div>
+        Select Date:
+        <input
+          type="date"
+          onChange={onDateChange}
+          value={selectedDate.toISOString().split("T")[0]} //must be in yyyy-mm-dd format
+          name="weekly"
+        ></input>
+      </div>
+
       {/* <div>
         <h2> Daily Goals</h2>
         <input
           type="date"
           onChange={onDateChange}
-          value={dayOf.toString().slice(0) || ''}
+          value={selectedDate.toString().slice(0) || ''}
           name="daily"
         ></input>
         <Table bordered striped>
@@ -225,12 +223,7 @@ export function ViewGoals() {
                     recordMatch = false;
                   if (goal.records.length > 0) {
                     goal.records.map((record) => {
-                      if (record.startDate.slice(0, 10) === weekOf) {
-                        complete = record.complete;
-                        recordId = record.id;
-                        recordPlan = record.plan;
-                        recordMatch = true;
-                      }
+                      //if completion date === dateSelected, complete = true
                     });
                   }
                   //the key to this nested .map was to include a return statement for each .map
@@ -271,9 +264,9 @@ export function ViewGoals() {
       </div> */}
       <div>
         <h2>Weekly Goals</h2>
-        <h3>
-          My week starts on:
-          <select onChange={changeWeekStart}>
+        {/* <h3>
+          My week starts on {weekStart}
+           <select onChange={changeWeekStart}>
             <option value="0">Sunday</option>
             <option value="1">Monday</option>
             <option value="2">Tuesday</option>

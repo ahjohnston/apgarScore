@@ -21,7 +21,6 @@ export function AddGoalModal() {
                 "Access-Control-Allow-Origin": "*"
             }
         }).then(function (response) {
-            console.log('response', response);
         }).catch(function (error) {
             console.log('error', error);
         });
