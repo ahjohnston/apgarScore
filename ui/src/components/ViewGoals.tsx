@@ -277,39 +277,39 @@ export function ViewGoals() {
             <option value="4">Thursday</option>
             <option value="5">Friday</option>
             <option value="6">Saturday</option>Ï{" "}
-          </select>
-        </h3>
-        <input
-          type="date"
-          onChange={onWeekChange}
-          value={weekOf.toString().slice(0) || ""}
-          name="weekly"
-        ></input>
+          </select> 
+        </h3> */}
+        {/* TODO format the week date range in a cute way*/}
+        <h5>Week of: {weekOf.toString().slice(0, 15)} - {weekEnds.toString().slice(0, 15)}</h5>
         <Table bordered striped>
           <thead>
             <tr>
               <th>Done</th>
               <th>Goal Name</th>
               <th>Plan</th>
-              <th>Edit</th>
-              <th>Delete</th>
+              <th>Edit this Goal</th>
             </tr>
           </thead>
           <tbody>
-            {weeklyGoals.length > 0
+            {weeklyGoals && weeklyGoals.length > 0
               ? weeklyGoals.map((goal: Goal) => {
                   let complete: boolean | null | undefined = false,
-                    recordId = null,
-                    recordPlan : string | null | undefined = "", //this didn't work using NULL (the previous plan would stick around, instead of the placeholder text)
-                    recordMatch = false;
+                    recordId: number | undefined = undefined,
+                    recordPlan: string | null | undefined = ""; //this didn't work using NULL (the previous plan would stick around, instead of the placeholder text)
                   if (goal.records.length > 0) {
                     goal.records.map((record: Record) => {
-                      if (record.startDate.slice(0, 10) === weekOf) {
-                        complete = record.complete;
+                      if (
+                        record.planDate &&
+                        weekOf < new Date(record.planDate) &&
+                        new Date(record.planDate) < weekEnds
+                      ) {
                         recordId = record.id;
                         recordPlan = record.plan;
-                        recordMatch = true;
                       }
+                      complete =
+                        record.dateComplete &&
+                        weekOf < record.dateComplete &&
+                        record.dateComplete < weekEnds;
                     });
                   }
                   //the key to this nested .map was to include a return statement for each .map
@@ -317,6 +317,7 @@ export function ViewGoals() {
                     <tr key={goal.id}>
                       <td>
                         <input
+                          id={recordId}
                           key={recordId}
                           name={goal.id.toString()}
                           type="checkbox"
@@ -327,6 +328,7 @@ export function ViewGoals() {
                       <td> {goal.goalName}</td>
                       <td>
                         <input
+                          id={recordId}
                           key={recordId} //TS doesn't like when I use 'id' here, since I've defined 'id' elsewhere. Dumb??
                           name={goal.id.toString()}
                           type="text"
