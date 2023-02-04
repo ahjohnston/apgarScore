@@ -63,9 +63,9 @@ class RecordController {
     @PatchMapping(path = "/records/byId")
     public ResponseEntity<Record> markComplete(
             @RequestParam Integer id,
-            @RequestParam(required = false) String dateComplete,
+            @RequestParam String planDate,
             @RequestParam(required = false) String plan,
-            @RequestParam String planDate) {
+            @RequestParam(required = false) String dateComplete) {
 
         Record updated = recordRepository.findById(id).get();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -91,8 +91,7 @@ class RecordController {
 
         recordRepository.save(updated);
 
-        // if NEITHER dateComplete & plan are present, then delete the damn record
-        if (dateComplete == null && plan == null) {
+        if (dateComplete == null && updated.getPlan() == null) {
             recordRepository.deleteById(id);
             // TODO do this better.
         }
