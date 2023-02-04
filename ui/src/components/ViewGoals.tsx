@@ -120,24 +120,24 @@ export function ViewGoals() {
     })
       .then((response) => {})
       .catch((error) => {
-        // console.log("error sir", error);
+        console.log("error sir", error);
       });
   }
 
   function markComplete(e: { target: any }) {
-    const { id, name, checked } = e.target;
+    const { id, checked } = e.target;
     const myRecord: Record = {
       id: id,
-      goalID: name,
       planDate: selectedDate,
-      dateComplete: checked ? selectedDate : null, //default completion date is the 'selected date'
+      dateComplete: checked ? selectedDate : null,
     };
     //if the record does not exist, do a POST
-    if (id == 0) {
+    if (id == undefined) {
       //TODO default id shouldn't be 0, it should be null or undefined
       postNewRecord(myRecord);
     } else {
       //if the recore already exists, do a PATCH
+      //BUG this must include a 'plan' string (or null/undefined)
       patchRecord(myRecord);
     }
   }
@@ -303,8 +303,12 @@ export function ViewGoals() {
                   let complete: boolean | null | undefined = false,
                     recordId: number | undefined = undefined,
                     recordPlan: string | null | undefined = ""; //this didn't work using NULL (the previous plan would stick around, instead of the placeholder text)
+                  //TODO move this functionality to the backend
+                  //instead of mapping through goals/records, and filtering by date
+                  //just make a get request  for recordsByGoalId / recordsByDate
                   if (goal.records.length > 0) {
                     goal.records.map((record: Record) => {
+
                       if (
                         record.planDate &&
                         weekOf < new Date(record.planDate) &&
@@ -337,6 +341,8 @@ export function ViewGoals() {
                         <input
                           id={recordId}
                           key={recordId} //TS doesn't like when I use 'id' here, since I've defined 'id' elsewhere. Dumb??
+                          //TODO BUG after typing one character in an empty plan (ie, a POST request)
+                          //the text field loses focus, and user has to re-select
                           name={goal.id.toString()}
                           type="text"
                           placeholder="Add your plan here"
@@ -345,7 +351,7 @@ export function ViewGoals() {
                         ></input>
                       </td>
                       <td>
-                        <button>Edit</button> 
+                        <button>Edit</button>
                         {/*TODO add an 'Edit Goal' modal (re-use Add New Goal modal)
                         add an 'active' toggle
                         add a filter in the Goal Grid, to only show active goals */}
