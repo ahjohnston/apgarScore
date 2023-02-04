@@ -10,9 +10,9 @@ export function ViewGoals() {
   const [weeklyGoals, setWeeklyGoals] = useState<Goal[] | null>(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const weekOf = getSunday(selectedDate);
-  const weekEnds = getSaturday(selectedDate);
-  const [weekStart, setWeekStart] = useState(0);
+  const [firstDayOfWeek, setFirstDayOfWeek] = useState(2); //TODO persist this as a 'user setting' or something
+  const weekOf = getFirstDayOfWeek();
+  const weekEnds = getLastDayOfWeek();
 
   type Goal = {
     id: number;
@@ -159,29 +159,33 @@ export function ViewGoals() {
       patchRecord(params);
     }
   }
-  //TODO: future feature: allow user to change what day the week starts on (default = Sunday)
-  // function changeWeekStart(e: { target: any }) {
-  //   setWeekStart(Number(e.target.value));
-  // }
-  function getSunday(date: Date) {
-    //TODO: change this to 'getFirstDayOfWeek' (user can customize what day the week starts on)
-    if (date.getDay() === 0) {
-      return date;
-    } else {
-      let myDate = new Date(date.toString());
-      myDate.setDate(date.getDate() - date.getDay());
+  function changeFirstDayOfWeek(e: { target: any }) {
+    setFirstDayOfWeek(Number(e.target.value));
+  }
+  //TODO is there a simpler way to do this? am i dumb?
+  function getFirstDayOfWeek() {
+    const differenceBetweenDays: number =
+      selectedDate.getDay() - firstDayOfWeek;
+    let myDate = new Date(selectedDate.toString());
+    if (differenceBetweenDays > 0) {
+      myDate.setDate(
+        selectedDate.getDate() - selectedDate.getDay() + firstDayOfWeek
+      );
       return myDate;
+    } else if (differenceBetweenDays < 0) {
+      myDate.setDate(
+        selectedDate.getDate() - selectedDate.getDay() + firstDayOfWeek - 7
+      );
+      return myDate;
+    } else {
+      //TODO BUG week range is incorrect in this case
+      return selectedDate;
     }
   }
-  function getSaturday(date: Date) {
-    //TODO: change this to 'getLastDayOfWeek' (user can customize what day the week starts on)
-    if (date.getDay() === 7) {
-      return date;
-    } else {
-      let myDate = new Date(date.toString());
-      myDate.setDate(date.getDate() - date.getDay() + 6);
-      return myDate;
-    }
+  function getLastDayOfWeek() {
+    let myDate = new Date(weekOf.toString());
+    myDate.setDate(weekOf.getDate() + 6);
+    return myDate;
   }
   function onDateChange(e: any) {
     setSelectedDate(new Date(e.target.value));
@@ -267,9 +271,9 @@ export function ViewGoals() {
       </div> */}
       <div>
         <h2>Weekly Goals</h2>
-        {/* <h3>
-          My week starts on {weekStart}
-           <select onChange={changeWeekStart}>
+        <h3>
+          My week starts on
+          <select onChange={changeFirstDayOfWeek}>
             <option value="0">Sunday</option>
             <option value="1">Monday</option>
             <option value="2">Tuesday</option>
@@ -277,10 +281,13 @@ export function ViewGoals() {
             <option value="4">Thursday</option>
             <option value="5">Friday</option>
             <option value="6">Saturday</option>Ï{" "}
-          </select> 
-        </h3> */}
+          </select>
+        </h3>
         {/* TODO format the week date range in a cute way*/}
-        <h5>Week of: {weekOf.toString().slice(0, 15)} - {weekEnds.toString().slice(0, 15)}</h5>
+        <h5>
+          Week of: {weekOf.toString().slice(4, 10)} -
+          {weekEnds.toString().slice(4, 10)}
+        </h5>
         <Table bordered striped>
           <thead>
             <tr>
