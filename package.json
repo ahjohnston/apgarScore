@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "epoq": "^1.0.4",
     "jslint": "^0.12.1"
   },
   "name": "appgar",
