@@ -4,9 +4,13 @@ import axios from "axios";
 import { useEffect } from "react";
 import { DateWithoutTime } from "epoq/lib/DateWithoutTime";
 import { printThisRecord } from "./methods.ts";
+import { useSelector, useDispatch } from "react-redux";
+import test from "node:test";
 
-export function GoalGrid(props) {
+export function GoalGrid(props: {cadence: string}) {
   const [goals, setGoals] = useState([]);
+  // const dateRedux = useSelector((state) => state.selectedDate.value)
+  // console.log('test', dateRedux)
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [firstDayOfWeek, setFirstDayOfWeek] = useState(2); //TODO persist this as a 'user setting' or something
